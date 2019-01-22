@@ -1,10 +1,11 @@
 //Author: Zedekiah Cole
 
-//Summary: This file is to 
+//Summary: This file displays hello world to
+// the user that goes onto the website.
 
 //file name: Index.js
 //Date made: January 17 2019
-//LTU: January 17 2019
+//LTE: January 22 2019
 
 
 //declaring local variables
