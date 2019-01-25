@@ -12,8 +12,20 @@
 var express = require('express'); 
 //constructing object and putting it into app.
 var app = express();
+
+//require translates json files
+var config = require('./config.json');
+
+//purpose to give help with url
+var url = require('url');
+
 //creating server port
-var port = 8080;
+//var port = 8080;
+
+
+//mounting middleware
+//it is a constructor
+app.use(require('cookie-parser')());
 
 
 //checking for my end points endpoint
@@ -24,6 +36,7 @@ app.get('/', function(req,res) {
 
 
 //building server and listening to the port
-app.listen(port,function(){
-    console.log("Server is listening on localhost:%s",port);
+app.listen(config.port,function(){
+    console.log("Server is listening on localhost:%s",config.port);
 });
+
