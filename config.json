@@ -7,6 +7,6 @@
     "consumer_secret": "MGXHT79PArQr9aluZsVkYDzBnJqbYjp1TjlOGjybzfuMsuB4BZ",
     "oauth_version": "1.0",
     "oauth_signature": "HMAC-SHA1",
-    "oauth_callback": "https://www.example.com/callback"
+    "oauth_callback": "https://zmctunnel.localtunnel.me/request_token"
     
 }
