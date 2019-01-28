@@ -13,6 +13,9 @@ var express = require('express');
 //constructing object and putting it into app.
 var app = express();
 
+//imports the file authenticator.js
+var authenticator = require('./authenticator.js');
+
 //require translates json files
 var config = require('./config.json');
 
@@ -25,6 +28,7 @@ var url = require('url');
 
 //mounting middleware
 //it is a constructor
+//it is an iffe returns function name
 app.use(require('cookie-parser')());
 
 
@@ -33,6 +37,15 @@ app.get('/', function(req,res) {
     //sends a response
     res.send("<h3>Hello, world!</h3>");
 });
+
+//pulling url route
+//naming so we can use it in another module
+app.get('/auth/twitter', authenticator.redirectToTwitterLoginPage);
+
+
+app.get('/auth/callback', function(req,res){
+    res.send("<h3>Hello, I am OAuth callback!</h3>")
+})
 
 
 //building server and listening to the port
