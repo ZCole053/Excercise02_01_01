@@ -5,7 +5,7 @@
 
 //file name: Index.js
 //Date made: January 17 2019
-//LTE: January 22 2019
+//LTE: January 29 2019
 
 
 //declaring local variables
@@ -43,13 +43,27 @@ app.get('/', function(req,res) {
 app.get('/auth/twitter', authenticator.redirectToTwitterLoginPage);
 
 
-app.get('/auth/callback', function(req,res){
-    res.send("<h3>Hello, I am OAuth callback!</h3>")
+app.get(url.parse(config.oauth_callback).path, function(req,res){
+    //creating a callback function with a callback function
+    authenticator.authenticate(req, res, function(err){
+        //if it erors it will send 401 to the user and the error in the console
+        if (err) {
+            console.log(err);  
+            //completes http rout
+            //completes the circle
+            res.sendStatus(401);
+        }else{
+            //Sends to a user that it works
+            res.send("Authentication successful!");
+        }
+    });
 })
 
 
 //building server and listening to the port
 app.listen(config.port,function(){
     console.log("Server is listening on localhost:%s",config.port);
+    //?
+    console.log('OAuth callback: ' + url.parse(config.oauth_callback).hostname + url.parse(config.oauth_callback).path);
 });
 
