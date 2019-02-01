@@ -42,6 +42,20 @@ app.get('/', function(req,res) {
 //naming so we can use it in another module
 app.get('/auth/twitter', authenticator.redirectToTwitterLoginPage);
 
+///creating route to post tweet
+//routes usually have req and res
+app.get('/tweet', function(req,res){
+    //grabs the credetials from the authenticator
+    var credentials = authenticator.getCredentials();
+    //if failure
+    if(!credentials.access_token || !credentials.access_token_secret){
+        ///prevents spin mode while also exiting the statment
+        return res.sendStatus(418);
+    }
+    res.sendStatus(200);
+});
+
+
 
 app.get(url.parse(config.oauth_callback).path, function(req,res){
     //creating a callback function with a callback function
