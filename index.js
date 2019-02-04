@@ -22,6 +22,12 @@ var config = require('./config.json');
 //purpose to give help with url
 var url = require('url');
 
+//not global, not npm, it is a core module
+var queryString =  require('querystring');
+
+//pulling in new async module file
+var async = require('async');
+
 //creating server port
 //var port = 8080;
 
@@ -52,9 +58,69 @@ app.get('/tweet', function(req,res){
         ///prevents spin mode while also exiting the statment
         return res.sendStatus(418);
     }
-    res.sendStatus(200);
+    var url = "https://api.twitter.com/1.1/statuses/update.json";
+    authenticator.post(url, credentials.access_token,credentials.access_token_secret, 
+        {
+            //text that is being tweeted
+            status: "Was up"
+     },function(error, data){
+        if(error){
+            //chain together response
+            return res.status(400).send(error);
+        }
+        res.send("Tweet successful");
+     });
 });
 
+//gets all the tweetes sent and replied to a certain account
+//get something off url bar
+app.get('/search', function(req, res){
+    var credentials = authenticator.getCredentials();
+     //if failure
+     if(!credentials.access_token || !credentials.access_token_secret){
+        ///prevents spin mode while also exiting the statment
+        return res.sendStatus(418);
+    }
+    var url = "https://api.twitter.com/1.1/search/tweets.json";
+    //filter stringify will format spaces and things for a url
+    var query = queryString.stringify({ q: 'NASA'});//sending json with name value pairs 
+    url += '?' + query;
+    //doesn't get body because data is not being posted
+    authenticator.get(url,credentials.access_token,credentials.access_token_secret, 
+    function(error,data){
+        if(error){
+            return res.status(400).send(error);
+        }
+        //sends back the data so we can see what we got
+        res.send(data);//debug
+    });
+});
+
+//cursor collection
+app.get('/friends', function(req, res){
+    var credentials = authenticator.getCredentials();
+     //if failure
+     if(!credentials.access_token || !credentials.access_token_secret){
+        ///prevents spin mode while also exiting the statment
+        return res.sendStatus(418);
+     }
+    var url = "https://api.twitter.com/1.1/friends/list.json";
+    //defaults to first page
+    //if not first time through it will execute
+    if(req.query.cursor){
+        //modifying the url
+        url += '?' + queryString.stringify({ cursor: req.query.cursor});
+    }
+    authenticator.get(url,credentials.access_token,credentials.access_token_secret,
+    function(error,data){
+        if(error){
+            //another example of a chain
+            return res.status(400).send(error);
+        }
+        res.send(data);//debug
+    });
+
+});
 
 
 app.get(url.parse(config.oauth_callback).path, function(req,res){

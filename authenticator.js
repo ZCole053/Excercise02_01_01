@@ -46,12 +46,12 @@ module.exports = {
     //creating a function to pass things to the get 
     //target api is the url
     get: function(url, access_token,access_token_secret,callback){
-        oauth.call.get(oauth,url,access_token,access_token_secret, callback);
+        oauth.get.call(oauth,url,access_token,access_token_secret, callback);
     },
 
     //generic post function
     post: function(url, access_token,access_token_secret,body,callback){
-        oauth.call.post(oauth,url,access_token,access_token_secret,body,callback);
+        oauth.post.call(oauth,url,access_token,access_token_secret,body,callback);
     },
 
     //created a json with a function in it
@@ -96,6 +96,7 @@ module.exports = {
                         //returns back the error
                         return callback(error);
                     }
+                    //grabs the data and makes it more readable and adds it to the data variable
                     data = JSON.parse(data);
                     //storeing items in variables
                     twitterCredentials.access_token = oauth_access_token;
