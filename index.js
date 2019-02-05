@@ -1,7 +1,7 @@
 //Author: Zedekiah Cole
 
-//Summary: This file displays hello world to
-// the user that goes onto the website.
+//Summary: This file displays multiple endpoints with different 
+//possible functions on the website 
 
 //file name: Index.js
 //Date made: January 17 2019
@@ -122,6 +122,51 @@ app.get('/friends', function(req, res){
 
 });
 
+
+//new route for waterfall method
+app.get('/allfriends', function(req,res){
+    var credentials = authenticator.getCredentials();
+    //constructing async waterfall
+    async.waterfall([
+        //get our friends ID'S
+        function(callback){
+            //preseting to 1
+            var cursor = -1;
+            var ids=[];
+            console.log("ids.length: " + ids.length);
+            //parm1 = when to stop, parm2 = what task it does in each loop
+            async.whilst(function(){//always returns bollean response
+                return cursor !=0;//return true
+            }, 
+            function(callback){
+                var url = "https://api.twitter.com/1.1/friends/ids.json";
+                url += "?" + queryString.stringify({ 
+                    user_id: credentials.twitter_id,
+                    cursor: cursor});
+                //requesting another page
+                authenticator.get(url,credentials.access_token,credentials.access_token_secret,
+                    function(error,data){
+                        if(error){
+                            return res.status(400).send(error);
+                        }
+                        //converts to usable json
+                        data = JSON.parse(data);
+                        //changes the cursor to the next one
+                        cursor = data.next_cursor_str;
+                        //array concat function
+                        ids = ids.concat(data, ids);
+                        //calling the callback
+                        callback();
+                });
+            });
+        },//start of task 2
+        //look up friends data
+        function(ids,callback){
+
+        }
+    ]);
+    res.sendStatus(200);//debug
+});
 
 app.get(url.parse(config.oauth_callback).path, function(req,res){
     //creating a callback function with a callback function
