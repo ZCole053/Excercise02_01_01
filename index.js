@@ -154,18 +154,61 @@ app.get('/allfriends', function(req,res){
                         //changes the cursor to the next one
                         cursor = data.next_cursor_str;
                         //array concat function
-                        ids = ids.concat(data, ids);
+                        ids = ids.concat(data.ids);
+                        console.log("ids.length: " + ids.length);//debug
                         //calling the callback
                         callback();
                 });
+            },
+            function(error){
+                console.log('last callback');
+                if(error){
+                    return res.status(500).send(error);
+                }
+                console.log(ids);
+                callback(null, ids);
             });
-        },//start of task 2
+        },
+        //start of task 2
         //look up friends data
         function(ids,callback){
-
+            var getHundredIds = function(i){
+                //slices the arrary requires the position and the amount of slices
+                return ids.slice(100*i, Math.min(ids.length, 100*(i+1)));
+            };
+            var requestsNeeded = Math.ceil(ids.length/100);
+            //second parameter does whatever our task is
+            //similar to for loop            same as i
+            async.times(requestsNeeded, function(n,next){
+                var url = "https://api.twitter.com/1.1/users/lookup.json";
+                url += "?" + queryString.stringify({ user_id: getHundredIds(n).join(',')});//join par1 needs what it seperates
+                authenticator.get(url,credentials.access_token,credentials.access_token_secret,
+                function(error,data){
+                    if(error){
+                        return res.status(400).send(error);//debug
+                    }
+                    var friends = JSON.parse(data);
+                    next(null, friends);
+                });
+            },
+            function(error,friends){
+                //console.log("n: ",n,friends);
+                //attempts to reduce the array to a single value
+                //friends/data is an array within an array 
+                friends = friends.reduce(function(previousValue,currentValue,currentIndex, array){
+                    //concat 2 arrays into 1
+                    return previousValue.concat(currentValue);
+                }, []);
+                //needs fnction on how to sort
+                friends.sort(function(a,b){
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                });
+                res.send(friends);
+                console.log('friends.length', friends.length);
+            });
         }
     ]);
-    res.sendStatus(200);//debug
+    //res.sendStatus(200);//debug
 });
 
 app.get(url.parse(config.oauth_callback).path, function(req,res){
